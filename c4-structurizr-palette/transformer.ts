@@ -104,6 +104,9 @@ const behaviorPatterns = {
   
     return `workspace "${data.data.getWorkspace.name}" "${data.data.getWorkspace.description}" {
     model {
+        properties {
+            "structurizr.groupSeparator" "/"
+        }
   ${modelSection}
     }
   }`;
