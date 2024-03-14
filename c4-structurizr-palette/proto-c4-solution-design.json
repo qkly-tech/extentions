@@ -1,0 +1,298 @@
+{
+    "$schema": "../palette_schema.json",
+    "id": "proto:c4-solution-design:20040311",
+    "title": "C4 - Solution Design Tool",
+    "constructors": [
+      {
+        "id": "proto:c4-solution-design:context:1",
+        "title": "C4-Context",
+        "description": "A System Context element provides a starting point, showing how the software system in scope fits into the world around it.",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/2276547-200.png",
+          "shadowTransform": true
+        },
+        "color": "#FE6847",
+        "schema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+       }
+      },
+      {
+        "id": "proto:c4-solution-design:software-system:1",
+        "title": "C4-Software-System",
+        "description": "A software system is a full working system or platform that in total delivers business value or outcomes",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/6638049-200.png",
+          "shadowTransform": true
+        },
+        "color": "#ae216c",
+        "schema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+       }
+      },
+      {
+        "id": "proto:c4-solution-design:container:1",
+        "title": "C4-Container",
+        "description": "A Container element zooms into the software system in scope, showing the high-level technical building blocks.",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/1154604-200.png",
+          "shadowTransform": true
+        },
+        "color": "#2176AE",
+        "schema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+       }
+      },
+      {
+        "id": "proto:c4-solution-design:component:1",
+        "title": "C4-Component-Generic",
+        "description": "A Component diagram zooms into an individual container, showing the components inside it.",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/2651586-200.png",
+          "shadowTransform": true
+        },
+        "color": "#B66D0D",
+        "schema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+       }
+      },
+      {
+        "id": "proto:c4-solution-design:code:1",
+        "title": "C4-Code",
+        "description": "A code (e.g. UML class) diagram can be used to zoom into an individual component, showing how that component is implemented.",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/1010350-200.png",
+          "shadowTransform": true
+        },
+        "color": "#F03A47",
+        "schema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+       }
+      },
+      {
+        "id": "proto:c4-solution-design:capability:1",
+        "title": "C4-Capability-Component",
+        "description": "Represents a capability or competency of the solution",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/1321173-200.png",
+          "shadowTransform": true
+        },
+        "color": "#665687",
+        "schema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+       }
+      },
+      {
+        "id": "proto:c4-solution-design:storage:1",
+        "title": "C4-Storage-Component",
+        "description": "Represents a storage component",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/6189848-200.png",
+          "shadowTransform": true
+        },
+        "color": "#7768AE",
+        "schema": {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            }
+          }
+         }
+      },
+      {
+        "id": "proto:c4-solution-design:interface:1",
+        "title": "C4-Interface-Component",
+        "description": "Represents an interface component, API, Event, File UI etc",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/4203234-200.png",
+          "shadowTransform": true
+        },
+        "color": "#950952",
+        "schema": {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            }
+          }
+         }
+      },
+      {
+        "id": "proto:c4-solution-design:service:1",
+        "title": "C4-Service-Component",
+        "description": "Represents a service component",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/2011860-200.png",
+          "shadowTransform": true
+        },
+        "color": "#FF9900",
+        "schema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["kubernetes", "functions", "Compute", "Storage", "Database", "Networking", "Security", "Machine Learning", "Analytics", "IoT", "Containers", "Blockchain", "DevOps", "Migration", "Monitoring", "AI/ML", "GameTech", "AR/VR", "Big Data", "Mobile", "Media", "Customer Engagement", "Backend", "Frontend",
+  
+   "Backendless", "Data Processing", "Content Delivery", "Identity and Access Management", "Messaging", "Business Applications", "Automation", "Robotics", "Edge Computing", "High Performance Computing", "Quantum Computing", "Compliance"]
+          }
+        }
+      }
+      },
+      {
+        "id": "proto:c4-solution-design:cloud:1",
+        "title": "C4-Cloud-Container",
+        "description": "Represents an infrastructure component",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/5153486-200.png",
+          "shadowTransform": true
+        },
+        "color": "#5C95FF",
+        "schema": {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["AWS", "Microsoft Azure", "Google Cloud Platform", "IBM Cloud", "Alibaba Cloud", "Oracle Cloud", "Salesforce", "VMware Cloud", "DigitalOcean", "Tencent Cloud", "Rackspace", "Red Hat OpenShift", "SAP Cloud Platform", "ServiceNow", "Heroku", "Cisco Cloud", "Adobe Cloud", "Box", "Dropbox", "NetSuite", "Workday", "Zendesk", "Zoho", "Snowflake", "MongoDB Atlas", "Cloudflare", "Twilio", "Akamai", "Citrix Cloud", "Nutanix", "Juniper Cloud", "Aruba Cloud", "Canonical Cloud", "Chef Automate", "HashiCorp Cloud", "Puppet Enterprise", "Splunk Cloud", "Datadog", "Elastic Cloud", "Logz.io", "Sumo Logic", "Dynatrace", "New Relic", "PagerDuty", "OpsGenie", "Atlassian Cloud", "GitHub", "GitLab", "Bitbucket", "JFrog", "Sonatype", "Docker Hub", "Kubernetes Engine", "OpenShift", "EKS", "AKS", "GKE"]
+            }
+          }
+         }
+      },
+      {
+        "id": "proto:c4-solution-design:data-object:1",
+        "title": "Data Object",
+        "description": "Represents a data object or entity within the solution",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/3033841-200.png",
+          "shadowTransform": true
+        },
+        "color": "#8A6EAF",
+        "schema": {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            }
+          }
+         }
+      },
+      {
+        "id": "proto:c4-solution-design:property:1",
+        "title": "Property",
+        "description": "Represents a property or attribute of a data object",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/6431884-200.png",
+          "shadowTransform": true
+        },
+        "color": "#EF798A",
+        "schema": {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            }
+          }
+         }
+      },
+      {
+        "id": "proto:c4-solution-design:person:1",
+        "title": "C4-Person",
+        "description": "Represents an actor or user",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/6540776-200.png",
+          "shadowTransform": true
+        },
+        "color": "#EF476F",
+        "schema": {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            }
+          }
+         }
+      },
+      {
+        "id": "proto:c4-solution-design:group:1",
+        "title": "C4-Group",
+        "description": "A cluster of things that belong together",
+        "icon": {
+          "url": "https://static.thenounproject.com/png/1069059-200.png",
+          "shadowTransform": true
+        },
+        "color": "#61b07c",
+        "schema": {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "details": {
+              "type": "string"
+            }
+          }
+         }
+      }
+    ]
+  }
+  
