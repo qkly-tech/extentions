@@ -1,0 +1,197 @@
+(
+    /* ==============================================================================================================*/
+    /* QKLY OPEN API REST API SCHEMA GENERATOR v0.01                                                                 */
+    /* ==============================================================================================================*/
+
+    /* Generic Function: Returns an <ARRAY> of "Entities" as Objects with details given an <ARRAY> of Entity IDs     */
+        $buildEntityArrayByIds := function($x) {(
+           $entitiesArray :=  $map($x, function($v, $i, $a) {
+                    data.getWorkspace.entities[id = $v]
+                });
+        )};
+
+    /* Generic Function: Returns an <ARRAY> of "Entities" as Objects with details given an <ARRAY> of Entity IDs and Performs a Filter based on Type    */
+        $buildEntityArrayByIdsWithFilter := function($x, $filter) {(
+           $entitiesArray :=  $map($x, function($v, $i, $a) {
+                    data.getWorkspace.entities[id = $v]
+                });
+
+            $return := $entitiesArray[constructor.id = $filter]
+        )};
+
+
+    /* Generic Function: Returns an <ARRAY> of "Entities" as Objects given the "Constructor Unique Name" */
+        $getEntityById := function($x) {(
+            $entities := data.getWorkspace.entities[constructor.id = $x] ;
+        )};
+
+    /* FUNCTION GROUP: Build Schemas Section                                                                         */
+    /* ==============================================================================================================*/
+        $getSchemas := function($x) {(
+
+            $entitiesObject := $getEntityById('proto:information-modelling:object:1');
+            $map($entitiesObject , function($v,$i,$a){
+                            $getObjectProperties($v)
+                    })
+        )};
+
+         /* function: get the definitions that exist within the workspace */
+        $getObjectProperties := function($x) {(
+
+            $children := $map($x.children[].id, function($v,$i,$a){
+                            $buildEntityArrayByIdsWithFilter($v, "proto:information-modelling:property:1")
+                        });
+
+            $relations := $map($x.linksOut[].target.id, function($v,$i,$a){
+
+                            $buildEntityArrayByIdsWithFilter($v, "proto:information-modelling:object:1")
+                        });
+
+            $relationsObject := $relations{
+                 name: {
+                     "type" : "array",
+                     "items" : {
+                         "$ref" :  "#/components/schemas/" & name
+                        }
+                    }
+            };
+
+            $childrenObject := $children{
+                 name:  {
+                            "x-id" : id,
+                            "description": description ? "default": "some default description",
+                            "type" : ($length($x.data) > 0) ?  $lowercase(($eval($x.data)).Type) : "string"
+                        }
+            };
+
+            $properties := $merge($append( $childrenObject,  $relationsObject));
+
+            $return := {
+                 $x.name : {
+                            "type" : "object",
+                            "properties" :  $properties
+                    }
+            }
+        )};
+
+    /* FUNCTION GROUP: Build "Paths" Section                                                                         */
+    /* ==============================================================================================================*/
+
+        /* Step 1: Get an <Array> of a specific Entity type (i.e. paths)*/
+        $getPaths := function($x) {(
+            $entitiesObject := $getEntityById('proto:api:path:1');
+
+            /* Step 2: Invoke a function call for every {object} in the Paths Array*/
+            $pathsComponent1:= $map($entitiesObject , function($v,$i,$a){
+                        $getPathsStructure($v)
+                    });
+
+        )};
+
+        /*---------------------------------------- CONTEXTUAL FUNCTIONS --------------------------------------------*/
+        /* A function that builds up the request body  (not working yet, need to get the child parameter*/
+
+        $defineParameters := function($x) {(
+
+            $parameters := $map($x, function($v,$i,$a){
+                 $return := $v {
+                        "name" : name,
+                        "in" :  ($length(data) > 0) ?  $lowercase(($eval(data))."in") : "header",
+                        "description" :  ($length(data)."description" > 0) ?  $lowercase(($eval(data))."description") : "Add a description",
+                        "required" :  ($length(data) > 0) ?  $boolean($lowercase(($eval(data))."required")) : false,
+                        "schema" : {
+                            "type" : ($length(data)."schema-type" > 0) ?  $lowercase(($eval(data))."schema-type") : "string",
+                            "default" :  ($length(data)."schema-default" > 0) ?  $lowercase(($eval(data))."schema-default") : ""
+                        }
+                 }
+            });
+
+           [$parameters];
+
+        )};
+
+            /*-----------------------------------------------------------------------------------*/
+
+        $defineRequestBody := function($x) {(
+
+            $requestBody := $map($x, function($v,$i,$a){
+                 $return := $v {
+                        "description" :  ($length(data)."description" > 0) ?  $lowercase(($eval(data))."description") : "Add a description",
+                         "content" : {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/" & linksOut.target.name
+                                                }
+                                            }
+                         }
+                 }
+            });
+
+           $requestBody;
+
+        )};
+
+        /*---------------------------------------- CONTEXTUAL FUNCTIONS --------------------------------------------*/
+
+
+        /* function: Perform a function on each Path "Path" Entity  */
+        $getPathsStructure := function($x) {(
+
+            $operations := $map($x.children[].id, function($v,$i,$a){
+                            /* Note the children are being filtered to only include operations. */
+                            $buildEntityArrayByIdsWithFilter($v, "proto:api:operation:1")
+                        });
+
+
+            $parameters := $map($x.children[].id, function($v,$i,$a){
+                    /* Note the children are being filtered to only include operations. */
+                    $buildEntityArrayByIdsWithFilter($v, "proto:api:parameter:1")
+                });
+
+            $return := {
+                  $lowercase($x.name) :  $operations {
+                      $lowercase(name) : {
+                            "x-id" : id,
+                            "description": description ? "default": "some default description",
+                            "responses" :  $buildEntityArrayByIdsWithFilter(children[].id, "proto:api:response:1") {
+                                 $lowercase(name) : {
+                                    "x-id" : id,
+                                    "description" : description ? "default": "no description provided",
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/" & linksOut.target.name
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                            $defineParameters($buildEntityArrayByIdsWithFilter(children[].id, "proto:api:parameter:1")) ? "parameters" : nul :  $defineParameters($buildEntityArrayByIdsWithFilter(children[].id, "proto:api:parameter:1")),
+                            $defineRequestBody($buildEntityArrayByIdsWithFilter(children[].id, "proto:api:request-body:1")) ? "requestBody" : nul :  $defineRequestBody($buildEntityArrayByIdsWithFilter(children[].id, "proto:api:request-body:1"))
+                      }
+                  }
+            }
+
+        )};
+
+    /* ==============================================================================================================*/
+    /* OUTPUT TEMPLATE FORMATTING                                                                                    */
+    /* ==============================================================================================================*/
+    /* Structure data that has been collected into the appropriate template */
+        {
+            "openapi" : "3.0.2",
+            "info" : $getEntityById("proto:api:api-specification:1") {
+                "title" : name,
+                "description" : description ? "default": "some default description",
+                "termsOfService" : ($length(data) > 0) ?  $lowercase(($eval(data))."Terms of Service") : "http://swagger.io/terms/",
+                "version" :  ($length(data) > 0) ?  $lowercase(($eval(data)).Version) : "1.0.0",
+                "contact" : {
+                    "email" : ($length(data) > 0) ?  $lowercase(($eval(data)).Contact) : "me@author.com"
+                }
+            },
+            "paths" : $merge($getPaths()),
+            "components" :  {
+                "schemas": $merge($getSchemas())
+                }
+         }
+    )
