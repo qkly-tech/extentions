@@ -136,6 +136,30 @@ function generateRelationshipSection(entity, entities, processedEntities, depth)
     return relationshipSection;
 }
 
+  // Obtain the relationship information as they relate 
+  function generateViewsSection() {
+     let viewSection = '';
+
+      viewSection += `views {
+        
+        styles {
+            element "Software System" {
+                background #ffffff
+                shape RoundedBox
+            }
+
+            element "Person" {
+                background #ffffff
+                shape Person
+            }
+        }
+        
+        theme https://static.structurizr.com/themes/microsoft-azure-2021.01.26/theme.json
+    }
+    `
+    return viewSection
+  }  
+
 
   // Generate the workspace file
   function generateWorkspaceFile(data) {
@@ -144,24 +168,32 @@ function generateRelationshipSection(entity, entities, processedEntities, depth)
   
     let modelSection = '';
     let relationshipSection = '';
+    let viewSection = '';
   
     // Generate model section recursively for each root entity
     entities.forEach(entity => {
-        if (!entity.linksOut || entity.linksOut.length === 0) {
+      //  if (!entity.linksOut || entity.linksOut.length === 0) {
             modelSection += generateModelSection(entity, entities, processedEntities, 1);   
-        }
+      //  }
         relationshipSection += generateRelationshipSection(entity, entities, processedEntities, 1);
     });
+
+     viewSection += generateViewsSection();
   
     return `workspace "${data.data.getWorkspace.name}" "${data.data.getWorkspace.description}" {
     model {
         properties {
             "structurizr.groupSeparator" "/"
         }
+        
    ${modelSection}
-
+   
    ${relationshipSection}
-    }
+   
+   }
+   
+   ${viewSection}
+    
   }`;
   }
   
