@@ -86,20 +86,71 @@ const behaviorPatterns = {
   
     return modelSection;
   }
-  
-  
+
+// Obtain the relationship information as they relate 
+function generateRelationshipSection(entity, entities, processedEntities, depth) {
+    let relationshipSection = '';
+
+    // Get behavior pattern or default
+    const behaviorPattern = behaviorPatterns[entity.constructor.id] || 'default'; // Get behavior pattern or default
+
+    // Convert entity name to camelCase
+    const camelCaseName = toCamelCase(entity.name);
+
+    // Add indentation based on depth
+    const indentation = '\t'.repeat(depth);
+
+    // Keep track of processed links to prevent duplicates
+    const processedLinks = new Set();
+
+    // If the entity has relationships, recursively generate the relationship model section for the relationships
+    if (entity.linksOut && entity.linksOut.length > 0) {
+        entity.linksOut.forEach(link => {
+            // Convert link name to camelCase
+            const camelCaseLinkName = toCamelCase(link.target.name);
+            if (!processedLinks.has(camelCaseLinkName)) {
+                // Check if either the source or the target is a group
+                const sourceIsGroup = behaviorPattern === 'group';
+                const targetEntity = entities.find(e => e.id === link.target.id);
+                const targetIsGroup = targetEntity && (behaviorPatterns[targetEntity.constructor.id] === 'group');
+
+                if (sourceIsGroup || targetIsGroup) {
+                    // If either the source or the target is a group, skip processing the link
+                    relationshipSection += `# ERROR: ${indentation}${camelCaseName} -> ${camelCaseLinkName}: Not allowed to link to or from groups\n`;
+                } else {
+                    // Process the link only if middleLabel is not null
+                    if (link.middleLabel !== null && link.middleLabel !== undefined) {
+                        relationshipSection += `${indentation}${camelCaseName} -> ${camelCaseLinkName} "${link.middleLabel}"\n`;
+                    } else {
+                        relationshipSection += `${indentation}${camelCaseName} -> ${camelCaseLinkName}\n`;
+                    }
+                }
+                processedLinks.add(camelCaseLinkName);
+            }
+        });
+    }
+
+    // Mark entity as processed
+    processedEntities.add(entity.id);
+
+    return relationshipSection;
+}
+
+
   // Generate the workspace file
   function generateWorkspaceFile(data) {
     const entities = data.data.getWorkspace.entities;
     const processedEntities = new Set(); // Keep track of processed entities
   
     let modelSection = '';
+    let relationshipSection = '';
   
     // Generate model section recursively for each root entity
     entities.forEach(entity => {
         if (!entity.linksOut || entity.linksOut.length === 0) {
-            modelSection += generateModelSection(entity, entities, processedEntities, 1);
+            modelSection += generateModelSection(entity, entities, processedEntities, 1);   
         }
+        relationshipSection += generateRelationshipSection(entity, entities, processedEntities, 1);
     });
   
     return `workspace "${data.data.getWorkspace.name}" "${data.data.getWorkspace.description}" {
@@ -107,7 +158,9 @@ const behaviorPatterns = {
         properties {
             "structurizr.groupSeparator" "/"
         }
-  ${modelSection}
+   ${modelSection}
+
+   ${relationshipSection}
     }
   }`;
   }
@@ -115,4 +168,3 @@ const behaviorPatterns = {
   // Call the function with your data
   const workspaceFile = generateWorkspaceFile(data);
   return workspaceFile;
-  
