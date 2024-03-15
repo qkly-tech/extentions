@@ -1,32 +1,33 @@
 {
-    getWorkspace(id: "${workspaceId}"){
+  getWorkspace(id: "0x2c060"){
+    id
+    name
+    description
+    entities {
       id
-      name
-      description
-      entities {
+      children {
         id
-        children {
-          id
-          display {
-            mode
-          }
+        display {
+          mode
         }
-        ...on Construct {
+      }
+      ...on Construct {
+        id
+        name
+        data
+        description
+        linksOut{
           id
-          name
-          data
-          description
-          linksOut{
-            id
-            target{
-              id,
-             name
-              }
-          }
-          constructor{
-            id
-          }
+          middleLabel
+          target{
+            id,
+           name
+            }
+        }
+        constructor{
+          id
         }
       }
     }
   }
+}
