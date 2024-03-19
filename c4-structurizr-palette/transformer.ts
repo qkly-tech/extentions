@@ -136,53 +136,133 @@ function generateRelationshipSection(entity, entities, processedEntities, depth)
     return relationshipSection;
 }
 
-  // Obtain the relationship information as they relate 
-  function generateViewsSection() {
-     let viewSection = '';
+  // Obtain the Dynamic views for the site-generator
+  function generateDynamicViewsSection(entity, entities, processedEntities, depth) {
 
-      viewSection += `views {
-        
-        styles {
-            element "Software System" {
-                background #ffffff
-                shape RoundedBox
-            }
-
-            element "Person" {
-                background #ffffff
-                shape Person
-            }
-        }
-        
-        theme https://static.structurizr.com/themes/microsoft-azure-2021.01.26/theme.json
+    let modelSection = '';
+    
+    let dynamicViewSection = '';
+    
+    
+    const behaviorPattern = behaviorPatterns[entity.constructor.id] || 'default'; // Get behavior pattern or default
+  
+    // Convert entity name to camelCase
+    const camelCaseName = toCamelCase(entity.name);
+  
+    // Add indentation based on depth
+    const indentation = '\t'.repeat(depth);
+  
+    // Check if the entity has already been processed
+    if (processedEntities.has(entity.id)) {
+        return dynamicViewSection; // Skip processing if entity has already been processed
     }
-    `
-    return viewSection
-  }  
+  
+    // Add the entity details to the model section based on behavior pattern
+    switch (behaviorPattern) {
+        case 'softwareSystem':
+        
+            // Generate a Uniquely Named SystemContex diagram for each softwareSystem
+            dynamicViewSection += `${indentation} 
+                systemContext ${camelCaseName} "${camelCaseName}_SystemContext" {
+                    include *
+                    autolayout
+                    title "C4 - System Context Digram of ${camelCaseName}" 
+                }
+            `;
+
+            // Generate a container diagram for each softwareSystem
+            dynamicViewSection += `${indentation} 
+                container ${camelCaseName} {
+                    include *
+                    autolayout
+                    title "C4 - System Context Digram of ${camelCaseName}" 
+                }
+            `;
+            break;
+        case 'container':
+            // Generate components of a container
+            dynamicViewSection += `${indentation} 
+                component ${camelCaseName} {
+                    include *
+                    autolayout
+                    title "C4 - System Context Digram of ${camelCaseName}" 
+                }
+            `;
+            break;
+        case 'person':
+            // Generate person model section
+          //  modelSection += `${indentation}${camelCaseName} = person "${entity.name}"`;
+            break;
+        case 'component':
+            // Generate software system model section
+
+            break;
+        case 'group':
+            // Generate group model section
+        //    modelSection += `${indentation}group "${entity.name}"`;
+            break;
+        default:
+            // Use default behavior for other types
+            // Generate software system model section
+            break;
+    }
+
+    // Mark entity as processed
+    processedEntities.add(entity.id);
+
+    return dynamicViewSection;
+  } 
 
 
   // Generate the workspace file
   function generateWorkspaceFile(data) {
     const entities = data.data.getWorkspace.entities;
     const processedEntities = new Set(); // Keep track of processed entities
+    const processedRelationshipEntities = new Set(); // Keep track of processed entities
+    const processedViewEntities = new Set(); // Keep track of processed entities
   
     let modelSection = '';
     let relationshipSection = '';
-    let viewSection = '';
+    let dynamicViewSection = '';
   
     // Generate model section recursively for each root entity
     entities.forEach(entity => {
-      //  if (!entity.linksOut || entity.linksOut.length === 0) {
-            modelSection += generateModelSection(entity, entities, processedEntities, 1);   
-      //  }
-        relationshipSection += generateRelationshipSection(entity, entities, processedEntities, 1);
+        modelSection += generateModelSection(entity, entities, processedEntities, 1);   
+        relationshipSection += generateRelationshipSection(entity, entities, processedRelationshipEntities, 1);
+        dynamicViewSection += generateDynamicViewsSection(entity, entities, processedViewEntities, 1);
     });
-
-     viewSection += generateViewsSection();
   
     return `workspace "${data.data.getWorkspace.name}" "${data.data.getWorkspace.description}" {
+    
+    !docs workspace-docs
+    !adrs workspace-adrs
+    
     model {
         properties {
+            "c4plantuml.elementProperties" "true"
+            "c4plantuml.tags" "true"
+            "generatr.style.colors.primary" "#FF00FF"
+            "generatr.style.colors.secondary" "#26BB98"
+            "generatr.style.faviconPath" "site/favicon.ico"
+            "generatr.style.logoPath" "https://cdn.icon-icons.com/icons2/1965/PNG/512/tool12_122837.png"
+
+            // Absolute URL's like "https://example.com/custom.css" are also supported
+            "generatr.style.customStylesheet" "site/custom.css"
+
+            "generatr.svglink.target" "_self"
+
+            // Full list of available "generatr.markdown.flexmark.extensions"
+            // "Abbreviation,Admonition,AnchorLink,Aside,Attributes,Autolink,Definition,Emoji,EnumeratedReference,Footnotes,GfmIssues,GfmStrikethroughSubscript,GfmTaskList,GfmUsers,GitLab,Ins,Macros,MediaTags,ResizableImage,Superscript,Tables,TableOfContents,SimulatedTableOfContents,Typographic,WikiLinks,XWikiMacro,YAMLFrontMatter,YouTubeLink"
+            // see https://github.com/vsch/flexmark-java/wiki/Extensions
+            // ATTENTION:
+            // * "generatr.markdown.flexmark.extensions" values must be separated by comma
+            // * it's not possible to use "GitLab" and "ResizableImage" extensions together
+            // default behaviour, if no generatr.markdown.flexmark.extensions property is specified, is to load the Tables extension only
+            "generatr.markdown.flexmark.extensions" "Abbreviation,Admonition,AnchorLink,Attributes,Autolink,Definition,Emoji,Footnotes,GfmTaskList,GitLab,MediaTags,Tables,TableOfContents,Typographic"
+
+            "generatr.site.exporter" "c4"
+            "generatr.site.externalTag" "External System"
+            "generatr.site.nestGroups" "false"
             "structurizr.groupSeparator" "/"
         }
         
@@ -191,8 +271,15 @@ function generateRelationshipSection(entity, entities, processedEntities, depth)
    ${relationshipSection}
    
    }
+   views {
    
-   ${viewSection}
+        systemlandscape "SystemLandscape" {
+            include *
+            autoLayout
+        }  
+     
+     ${dynamicViewSection}
+   }
     
   }`;
   }
